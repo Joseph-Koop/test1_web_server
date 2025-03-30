@@ -6,6 +6,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net"
@@ -15,16 +16,35 @@ import (
 	"time"
 )
 
+type ScanResult struct {
+	Target string `json:"target"`
+	Port int `json:"port"`
+	Banner string `json:"banner"`
+}
+
+type ScanSummary struct {
+	TotalPorts int `json:"total"`
+	OpenPorts int `json:"ports"`
+	TimeTaken float64 `json:"time"`
+}
+
+type ScanReport struct {
+	Summary ScanSummary `json:"summary"`
+	Results []ScanResult `json:"results"`
+}
+
 var openPorts int = 0
 var totalPorts int = 0
 var mutex sync.Mutex		//implemented so that openPorts and total Ports update safely even though asynchronous functions are involved
-var successfulPorts map[string][]string
+var successfulPorts []ScanResult
 
 func worker(wg *sync.WaitGroup, tasks chan string, dialer net.Dialer, portCount int) {
 	defer wg.Done()
 	maxRetries := 3
 	for addr := range tasks {
-		var success bool
+		success := false
+		target, portStr, _ := net.SplitHostPort(addr)
+		port, _ := strconv.Atoi(portStr)
 		fmt.Printf("\nScanning port %s out of %d total ...", addr, portCount)
 		for i := range maxRetries {
 			conn, err := dialer.Dial("tcp", addr)
@@ -54,13 +74,12 @@ func worker(wg *sync.WaitGroup, tasks chan string, dialer net.Dialer, portCount 
 					//fmt.Printf("\nConnection to %s was successful.", addr)
 					//fmt.Println("\nBanner Error: ", err)
 				}
-				fmt.Println()
 				conn.Close()
 
 				mutex.Lock()
 				openPorts += 1
 				totalPorts += 1
-				successfulPorts[addr] = append(successfulPorts[addr], fmt.Sprintf("%s - %s", addr, banner))
+				successfulPorts = append(successfulPorts, ScanResult{Target: target, Port: port, Banner: banner})
 				mutex.Unlock()
 
 				success = true
@@ -91,18 +110,18 @@ func main() {
 	endPort := flag.Int("end", 1024, "End of Port Range")
 	workers := flag.Int("workers", 100, "Number of concurrent workers")
 	timeout := flag.Duration("timeout", 500*time.Millisecond, "Connection Timeout")
+	jsonOutput := flag.Bool("json", false, "Output results in JSON format")
 
 	flag.Parse()
 
 	targetList := strings.Split(*target, ",")
-	successfulPorts = make(map[string][]string)
 
 	//portCount := *endPort - *startPort + 1
 	var portsToScan []int
 	if *ports != "" {
 		portList := strings.Split(*ports, ",")
 		for _, port := range portList {
-			portInt, err := strconv.Atoi(strings.TrimSpace(port))
+			portInt, err := strconv.Atoi(port)
 			if err == nil {
 				portsToScan = append(portsToScan, portInt)
 			}
@@ -135,13 +154,28 @@ func main() {
 	close(tasks)
 	wg.Wait()
 
-	fmt.Print("\n\n\nOPEN PORTS\n")
-	for target, ports := range successfulPorts {
-		fmt.Printf("\nResults for: %s\n", target)
-		for _, result := range ports{
-			fmt.Println(result)
+	if *jsonOutput {
+		report := ScanReport{
+			Results: successfulPorts,
+			Summary: ScanSummary{
+				TotalPorts: totalPorts,
+				OpenPorts: openPorts,
+				TimeTaken: time.Since(start).Seconds(),
+			},
 		}
+		jsonData, err := json.MarshalIndent(report, "", " ")
+		if err != nil {
+			fmt.Println("Error encoding JSON:", err)
+			return
+		}
+		fmt.Print("\n\n\n\nRESULTS\n")
+		fmt.Println(string(jsonData))
+	}else{
+		fmt.Print("\n\n\n\nOPEN PORTS\n")
+		for _, result := range successfulPorts {
+			fmt.Printf("\nTarget: %s\nPort: %d\nBanner: %s\n", result.Target, result.Port, result.Banner)
+		}
+		fmt.Print("\n\nSUMMARY\n")
+		fmt.Printf("\nTotal ports scanned: %d \nNumber of open ports: %d \nTime taken: %.2f seconds\n\n", totalPorts, openPorts, time.Since(start).Seconds())
 	}
-	fmt.Print("\n\n\nSUMMARY\n")
-	fmt.Printf("\nTotal ports scanned: %d \nNumber of open ports: %d \nTime taken: %.2f seconds\n\n", totalPorts, openPorts, time.Since(start).Seconds())
 }
