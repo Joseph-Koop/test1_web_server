@@ -22,28 +22,28 @@ ________________________________________________________________________________
 How to Use:<br>
 
 You can run this program in your IDE using this base command:<br>
-    go run main.go <br>
+>    go run main.go <br>
 
 If you want to alter the default options, add flags after the command. Change the provided examples with your requests:<br>
-    Target:<br>
-        -target=example.com<br>
-        -target "example.com,scanme.nmap.org"<br>
-    Ports:<br>
-        -ports=80<br>
-        -ports "20,22,80,443"<br>
-    Start Port:<br>
-        -start=78<br>
-    End Port:<br>
-        -end=82<br>
-    Workers:<br>
-        -workers=200<br>
-    Timeout:<br>
-        -timeout=1000ms<br>
-    JSON Output:<br>
-        -json=true<br>
+>    Target:<br>
+>>       -target=example.com<br>
+>>        -target "example.com,scanme.nmap.org"<br>
+>    Ports:<br>
+>>        -ports=80<br>
+>>        -ports "20,22,80,443"<br>
+>    Start Port:<br>
+>>        -start=78<br>
+>    End Port:<br>
+>>        -end=82<br>
+>    Workers:<br>
+>>        -workers=200<br>
+>    Timeout:<br>
+>>        -timeout=1000ms<br>
+>    JSON Output:<br>
+>>        -json=true<br>
 
 Alternatively, you can build and then run:<br>
-    go build main.go<br>
+>    go build main.go<br>
 Then type ./main followed by any command line flags. You can do this as many times as desired without repeating go build main.go.
 ________________________________________________________________________________________________________________________________________
 
