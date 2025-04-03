@@ -27,7 +27,7 @@ You can run this program in your IDE using this base command:<br>
 If you want to alter the default options, add flags after the command. Change the provided examples with your requests:<br>
 >    Target:<br>
 >>       -target=example.com<br>
->>        -target "example.com,scanme.nmap.org"<br>
+>>       -target "example.com,scanme.nmap.org"<br>
 >    Ports:<br>
 >>        -ports=80<br>
 >>        -ports "20,22,80,443"<br>
