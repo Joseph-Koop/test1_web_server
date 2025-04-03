@@ -1,10 +1,14 @@
 <!-- README.md -->
 
-Port Scanner
-Joseph Koop
-Systems Programming and Computer Organization
-Test #1
-March 30, 2024
+<strong>Port Scanner</strong>
+<strong>Joseph Koop</strong>
+<strong>Systems Programming and Computer Organization</strong>
+<strong>Test #1</strong>
+<strong>March 30, 2024</strong>
+
+<br><br>
+<strong>Link to video:</strong>
+https://youtu.be/LXhA6hgjZbo
 ________________________________________________________________________________________________________________________________________
 
 Overview:
