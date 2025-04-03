@@ -1,10 +1,10 @@
 <!-- README.md -->
 
-<strong>Port Scanner</strong>
-<strong>Joseph Koop</strong>
-<strong>Systems Programming and Computer Organization</strong>
-<strong>Test #1</strong>
-<strong>March 30, 2024</strong>
+<strong>Port Scanner</strong><br>
+<strong>Joseph Koop</strong><br>
+<strong>Systems Programming and Computer Organization</strong><br>
+<strong>Test #1</strong><br>
+<strong>March 30, 2024</strong><br>
 
 <br><br>
 <strong>Link to video:</strong>
